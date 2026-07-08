@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khảo sát Khung Năng lực số Sinh viên</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tech: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Thư viện QRCode.js CDN để tạo mã QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" xintegrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07Ji04E6AX4LKtFiGcSLODGGfp2abnODM6qu64JHcURgUhYzyDbBYnFQqjdu5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar cho bảng dữ liệu */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-tech-800 to-tech-950 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10">
+                    <svg class="w-8 h-8 text-tech-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
+                    <p class="text-xs sm:text-sm text-tech-200 font-medium">Khung đánh giá chuẩn hóa kỹ năng số dành cho Sinh viên</p>
+                </div>
+            </div>
+            
+            <!-- NAV TABS -->
+            <nav class="flex bg-tech-900/60 p-1.5 rounded-xl border border-white/5 w-full md:w-auto overflow-x-auto">
+                <button onclick="switchTab('survey-tab')" id="btn-survey-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap bg-white text-tech-950 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Sinh viên Khảo sát
+                </button>
+                <button onclick="switchTab('qr-tab')" id="btn-qr-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                    Mã QR Lớp học
+                </button>
+                <button onclick="switchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Thống kê & Kết quả
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 w-full">
+
+        <!-- SUCCESS NOTIFICATION / MODAL -->
+        <div id="success-toast" class="hidden fixed bottom-5 right-5 z-50 bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-10 opacity-0">
+            <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <h4 class="font-bold text-sm">Gửi khảo sát thành công!</h4>
+                <p class="text-xs text-emerald-100">Cảm ơn bạn đã tham gia đánh giá năng lực số.</p>
+            </div>
+        </div>
+
+        <!-- TAB A: KHU VỰC KHẢO SÁT (SINH VIÊN) -->
+        <section id="survey-tab" class="tab-content block">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-tech-500 px-6 py-4 text-white">
+                    <h2 class="text-lg font-bold">Phiếu Tự Đánh Giá Khung Năng Lực Số</h2>
+                    <p class="text-xs text-tech-50 opacity-90">Vui lòng cung cấp chính xác thông tin và đánh giá trung thực mức độ năng lực của bạn.</p>
+                </div>
+                
+                <form id="survey-form" class="p-6 sm:p-8 space-y-8" onsubmit="handleFormSubmit(event)">
+                    <!-- Thông tin cá nhân -->
+                    <div class="space-y-4">
+                        <h3 class="text-md font-semibold text-slate-800 flex items-center gap-2">
+                            <span class="w-1 h-5 bg-tech-500 rounded-full"></span>
+                            Thông tin cá nhân
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="student-name" class="block text-sm font-medium text-slate-700 mb-1.5">Họ và tên Sinh viên <span class="text-rose-500">*</span></label>
+                                <input type="text" id="student-name" required placeholder="Ví dụ: Nguyễn Văn A" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-tech-500 focus:border-tech-500 outline-none transition-all duration-200">
+                            </div>
+                            <div>
+                                <label for="student-id" class="block text-sm font-medium text-slate-700 mb-1.5">Mã số Sinh viên (MSSV)</label>
+                                <input type="text" id="student-id" placeholder="Ví dụ: B21DCCN001" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-tech-500 focus:border-tech-500 outline-none transition-all duration-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Đánh giá 7 tiêu chí -->
+                    <div class="space-y-4">
+                        <h3 class="text-md font-semibold text-slate-800 flex items-center gap-2">
+                            <span class="w-1 h-5 bg-tech-500 rounded-full"></span>
+                            Đánh giá năng lực theo 7 tiêu chí cốt lõi
+                        </h3>
+                        <p class="text-xs text-slate-500 bg-slate-100 p-3 rounded-lg border border-slate-200/50">
+                            <strong>Hướng dẫn chấm điểm:</strong> Hãy chọn điểm số tự đánh giá của bản thân từ <strong>1 đến 5</strong> theo các mức sau:<br>
+                            <span class="inline-block mt-1">
+                                <strong class="text-slate-700">1:</strong> Chưa từng nghe/chưa biết | 
+                                <strong class="text-slate-700">2:</strong> Hiểu biết sơ bộ | 
+                                <strong class="text-slate-700">3:</strong> Có khả năng ứng dụng | 
+                                <strong class="text-slate-700">4:</strong> Thành thạo | 
+                                <strong class="text-slate-700">5:</strong> Chuyên gia/Có khả năng hướng dẫn lại.
+                            </span>
+                        </p>
+
+                        <!-- GRID TIÊU CHÍ TRÊN PC (Desktop layout: Table) -->
+                        <div class="hidden md:block overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-100/80 border-b border-slate-200">
+                                        <th class="py-4 px-6 text-sm font-semibold text-slate-700 w-1/2">Tiêu chí năng lực số</th>
+                                        <th class="py-4 px-3 text-sm font-semibold text-slate-700 text-center w-10">1</th>
+                                        <th class="py-4 px-3 text-sm font-semibold text-slate-700 text-center w-10">2</th>
+                                        <th class="py-4 px-3 text-sm font-semibold text-slate-700 text-center w-10">3</th>
+                                        <th class="py-4 px-3 text-sm font-semibold text-slate-700 text-center w-10">4</th>
+                                        <th class="py-4 px-3 text-sm font-semibold text-slate-700 text-center w-10">5</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    <!-- Row 1 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">1. Sử dụng thiết bị, phần mềm và mạng</div>
+                                            <div class="text-xs text-slate-500">Khả năng tự vận hành các thiết bị số, sử dụng các phần mềm, nền tảng, thiết lập môi trường mạng cơ bản.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_1" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_1" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_1" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_1" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_1" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 2 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">2. Khai thác thông tin và dữ liệu</div>
+                                            <div class="text-xs text-slate-500">Tìm kiếm, lọc thông tin số, đánh giá tính chính xác của dữ liệu, biết cách phân loại và bảo lưu thông tin sạch.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_2" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_2" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_2" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_2" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_2" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 3 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">3. Giao tiếp và hợp tác trong môi trường số</div>
+                                            <div class="text-xs text-slate-500">Truyền thông qua các nền tảng trực tuyến, tham gia thảo luận nhóm từ xa, có chuẩn mực ứng xử số tốt.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_3" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_3" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_3" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_3" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_3" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 4 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">4. An toàn và bảo mật số</div>
+                                            <div class="text-xs text-slate-500">Bảo mật tài khoản, nhận diện mã độc/scam trực tuyến, quản lý dữ liệu cá nhân an toàn trên Internet.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_4" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_4" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_4" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_4" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_4" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 5 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">5. Sáng tạo nội dung số</div>
+                                            <div class="text-xs text-slate-500">Soạn thảo văn bản, thiết kế slide, dựng video cơ bản, biết cách ghi nguồn thông tin/tác quyền số.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_5" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_5" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_5" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_5" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_5" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 6 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">6. Giải quyết vấn đề trong môi trường số</div>
+                                            <div class="text-xs text-slate-500">Tự sửa lỗi máy tính đơn giản, biết lựa chọn nền tảng tối ưu hóa khi xử lý công việc trực tuyến.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_6" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_6" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_6" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_6" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_6" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- Row 7 -->
+                                    <tr class="hover:bg-slate-50/50">
+                                        <td class="py-4 px-6">
+                                            <div class="font-medium text-slate-800">7. Học tập và phát triển nghề nghiệp</div>
+                                            <div class="text-xs text-slate-500">Tự rèn luyện, đăng ký khóa học online, chủ động tích lũy các bộ kỹ năng chuyển đổi thời kỳ 4.0.</div>
+                                        </td>
+                                        <td class="text-center py-4" colspan="5">
+                                            <div class="flex justify-around items-center h-full">
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_7" value="1" required class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_7" value="2" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_7" value="3" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_7" value="4" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                                <label class="flex justify-center items-center w-10 h-10 cursor-pointer"><input type="radio" name="criteria_7" value="5" class="w-4 h-4 text-tech-600 focus:ring-tech-500"></label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- MOBILE TIÊU CHÍ (Mobile layout: Cards) -->
+                        <div class="md:hidden space-y-4">
+                            <!-- Card 1 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">1. Sử dụng thiết bị, phần mềm và mạng</div>
+                                    <div class="text-xs text-slate-500">Khả năng tự vận hành thiết bị số, ứng dụng cơ bản.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_1_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_1_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_1_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_1_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_1_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 2 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">2. Khai thác thông tin và dữ liệu</div>
+                                    <div class="text-xs text-slate-500">Tìm kiếm, lọc thông tin, phân loại dữ liệu chính xác.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_2_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_2_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_2_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_2_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_2_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 3 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">3. Giao tiếp và hợp tác trong môi trường số</div>
+                                    <div class="text-xs text-slate-500">Truyền thông trực tuyến, học nhóm, chuẩn mực số.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_3_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_3_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_3_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_3_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_3_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 4 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">4. An toàn và bảo mật số</div>
+                                    <div class="text-xs text-slate-500">Bảo mật tài khoản, nhận diện mã độc/scam.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_4_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_4_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_4_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_4_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_4_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 5 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">5. Sáng tạo nội dung số</div>
+                                    <div class="text-xs text-slate-500">Soạn thảo, thiết kế slide, dựng video cơ bản.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_5_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_5_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_5_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_5_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_5_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 6 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">6. Giải quyết vấn đề trong môi trường số</div>
+                                    <div class="text-xs text-slate-500">Tự phát hiện, sửa lỗi máy tính đơn giản.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_6_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_6_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_6_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_6_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_6_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 7 -->
+                            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
+                                <div>
+                                    <div class="font-semibold text-slate-800 text-sm">7. Học tập và phát triển nghề nghiệp</div>
+                                    <div class="text-xs text-slate-500">Tự rèn luyện, định hướng ứng dụng công nghệ 4.0.</div>
+                                </div>
+                                <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-slate-100">
+                                    <span class="text-xs font-semibold text-slate-500">Chọn điểm:</span>
+                                    <div class="flex gap-2">
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_7_mob" value="1" required class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">1</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_7_mob" value="2" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">2</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_7_mob" value="3" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">3</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_7_mob" value="4" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">4</span></label>
+                                        <label class="flex flex-col items-center"><input type="radio" name="criteria_7_mob" value="5" class="w-5 h-5 text-tech-600"><span class="text-[10px] mt-0.5 text-slate-400">5</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút Gửi Khảo Sát -->
+                    <div class="flex justify-end pt-4 border-t border-slate-150">
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-tech-600 to-tech-700 hover:from-tech-700 hover:to-tech-800 text-white font-semibold rounded-xl shadow-md shadow-tech-500/10 hover:shadow-lg hover:shadow-tech-500/20 active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2">
+                            Gửi Khảo Sát
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB B: KHU VỰC ĐIỀU HÀNH (GIẢNG VIÊN - QR CODE) -->
+        <section id="qr-tab" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden max-w-2xl mx-auto">
+                <div class="bg-tech-600 px-6 py-4 text-white">
+                    <h2 class="text-lg font-bold">Mã QR Lớp học</h2>
+                    <p class="text-xs text-tech-50 opacity-90">Sử dụng để sinh viên trên lớp quét nhanh tham gia làm bài khảo sát.</p>
+                </div>
+                
+                <div class="p-6 sm:p-8 flex flex-col items-center space-y-6 text-center">
+                    <div class="bg-slate-50 border border-dashed border-slate-300 rounded-2xl p-6 flex flex-col items-center shadow-inner">
+                        <!-- Vùng hiển thị mã QR -->
+                        <div id="qrcode-container" class="bg-white p-4 rounded-xl shadow border border-slate-100 flex items-center justify-center"></div>
+                        <div class="mt-4 font-semibold text-slate-700 text-sm">Quét để truy cập link khảo sát</div>
+                    </div>
+
+                    <div class="w-full space-y-3">
+                        <label class="block text-xs font-semibold text-slate-500 text-left uppercase tracking-wider">Đường dẫn khảo sát hiện tại</label>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="qr-url-input" readonly class="bg-slate-100 border border-slate-200 text-slate-600 rounded-lg px-3 py-2 w-full text-xs font-mono select-all focus:outline-none">
+                            <button onclick="copyToClipboard()" class="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 px-3 py-2 rounded-lg text-xs font-medium transition duration-200 flex items-center gap-1 active:scale-95 whitespace-nowrap">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                                Sao chép
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 text-left">Đường dẫn tự động điều chỉnh theo URL hệ thống mạng hiện tại.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 w-full">
+                        <button onclick="generateQR()" class="py-2.5 px-4 bg-tech-100 hover:bg-tech-200 text-tech-800 text-sm font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"></path></svg>
+                            Tải lại QR
+                        </button>
+                        <button onclick="printQR()" class="py-2.5 px-4 bg-tech-600 hover:bg-tech-700 text-white text-sm font-semibold rounded-lg transition duration-200 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-3a2 2 0 00-2-2H9a2 2 0 00-2 2v3a2 2 0 002 2zm5-11h.01M12 11h.01"></path></svg>
+                            In mã QR
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB C: KHU VỰC THỐNG KÊ (GIẢNG VIÊN - BẢNG KẾT QUẢ) -->
+        <section id="stats-tab" class="tab-content hidden space-y-6">
+            <!-- Thẻ thông tin nhanh -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Số SV tham gia</div>
+                        <div id="stat-total-students" class="text-2xl font-bold text-slate-800">0</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-teal-50 text-teal-600 rounded-xl">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Trung bình tổng điểm</div>
+                        <div id="stat-avg-score" class="text-2xl font-bold text-slate-800">0.0 / 35</div>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Đạt Khá - Giỏi (>= 25đ)</div>
+                        <div id="stat-good-count" class="text-2xl font-bold text-slate-800">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng xếp hạng / Thống kê chi tiết -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="bg-tech-900 px-6 py-4 text-white flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold">Danh Sách Kết Quả & Bảng Xếp Hạng</h2>
+                        <p class="text-xs text-tech-200">Được sắp xếp theo tổng điểm năng lực từ CAO xuống THẤP.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportToCSV()" class="px-3.5 py-1.5 bg-tech-800 hover:bg-tech-700 text-white text-xs font-medium rounded-lg transition duration-150 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Xuất Excel (CSV)
+                        </button>
+                        <button onclick="clearAllData()" class="px-3.5 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 hover:text-white text-xs font-medium rounded-lg transition duration-150 flex items-center gap-1 border border-rose-500/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            Xóa toàn bộ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                        <table class="w-full text-left border-collapse" id="stats-table">
+                            <thead>
+                                <tr class="bg-slate-100/80 border-b border-slate-200">
+                                    <th class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center w-12">Hạng</th>
+                                    <th class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">Họ và tên</th>
+                                    <th class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">MSSV</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="Sử dụng thiết bị & phần mềm">TC1</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="Khai thác dữ liệu">TC2</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="Giao tiếp số">TC3</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="An toàn bảo mật">TC4</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="Sáng tạo nội dung">TC5</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="Giải quyết vấn đề">TC6</th>
+                                    <th class="py-3.5 px-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-center" title="Phát triển nghề nghiệp">TC7</th>
+                                    <th class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center font-bold text-tech-900 bg-tech-50">Tổng điểm</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-150" id="results-tbody">
+                                <!-- Dữ liệu nạp từ JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="no-data-msg" class="hidden text-center py-12 text-slate-400">
+                        <svg class="w-16 h-16 mx-auto mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="text-sm font-medium">Chưa có dữ liệu khảo sát nào được ghi nhận.</p>
+                        <p class="text-xs mt-1">Các lượt khảo sát mới sau khi nộp sẽ tự động hiển thị ở đây.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Diễn giải viết tắt -->
+            <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 text-xs text-slate-500 space-y-1">
+                <div class="font-bold text-slate-700">Chú thích các từ viết tắt của 7 Tiêu chí:</div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-1">
+                    <div><strong>TC1:</strong> Sử dụng thiết bị & phần mềm</div>
+                    <div><strong>TC2:</strong> Khai thác dữ liệu số</div>
+                    <div><strong>TC3:</strong> Giao tiếp & Hợp tác số</div>
+                    <div><strong>TC4:</strong> An toàn & Bảo mật số</div>
+                    <div><strong>TC5:</strong> Sáng tạo nội dung số</div>
+                    <div><strong>TC6:</strong> Giải quyết vấn đề</div>
+                    <div><strong>TC7:</strong> Định hướng nghề nghiệp</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 Hệ thống khảo sát Khung năng lực số Sinh viên.</p>
+            <p class="mt-1">Thiết kế đáp ứng tiêu chuẩn Giáo dục Số hiện đại.</p>
+        </div>
+    </footer>
+
+    <!-- LOGIC JAVASCRIPT -->
+    <script>
+        // Khởi tạo/Load dữ liệu từ LocalStorage
+        let surveyData = JSON.parse(localStorage.getItem('dcf_survey_results')) || [];
+
+        window.onload = function() {
+            // Cập nhật lại đường dẫn URL hiển thị của ứng dụng hiện tại
+            const currentURL = window.location.href;
+            document.getElementById('qr-url-input').value = currentURL;
+
+            // Render mã QR tự động
+            generateQR();
+
+            // Render bảng thống kê
+            updateStatistics();
+
+            // Đồng bộ bộ chọn câu hỏi giữa PC và Mobile (Đảm bảo require hoạt động chuẩn)
+            syncResponsiveForms();
+        };
+
+        // Chuyển đổi qua lại giữa 3 TAB chính
+        function switchTab(tabId) {
+            // Ẩn tất cả các Section
+            const sections = document.querySelectorAll('.tab-content');
+            sections.forEach(sec => sec.classList.add('hidden'));
+            sections.forEach(sec => sec.classList.remove('block'));
+
+            // Hiển thị Section được chọn
+            const activeSection = document.getElementById(tabId);
+            activeSection.classList.remove('hidden');
+            activeSection.classList.add('block');
+
+            // Cập nhật trạng thái màu sắc nút Navigation
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white";
+            });
+
+            const activeButton = document.getElementById('btn-' + tabId);
+            activeButton.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap bg-white text-tech-950 shadow-sm";
+        
+            if(tabId === 'stats-tab') {
+                updateStatistics();
+            }
+        }
+
+        // Đồng bộ hóa việc nhập biểu mẫu giữa phiên bản điện thoại và máy tính
+        function syncResponsiveForms() {
+            const numCriteria = 7;
+            for(let i = 1; i <= numCriteria; i++) {
+                // Khi thay đổi trên máy tính -> đồng bộ sang điện thoại
+                const pcRadios = document.querySelectorAll(`input[name="criteria_${i}"]`);
+                pcRadios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const val = e.target.value;
+                        const mobRadio = document.querySelector(`input[name="criteria_${i}_mob"][value="${val}"]`);
+                        if(mobRadio) mobRadio.checked = true;
+                    });
+                });
+
+                // Khi thay đổi trên điện thoại -> đồng bộ sang máy tính
+                const mobRadios = document.querySelectorAll(`input[name="criteria_${i}_mob"]`);
+                mobRadios.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const val = e.target.value;
+                        const pcRadio = document.querySelector(`input[name="criteria_${i}"][value="${val}"]`);
+                        if(pcRadio) pcRadio.checked = true;
+                    });
+                });
+            }
+        }
+
+        // Xử lý nộp biểu mẫu khảo sát
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const studentName = document.getElementById('student-name').value.trim();
+            const studentId = document.getElementById('student-id').value.trim() || 'Không cung cấp';
+
+            // Thu thập điểm của 7 tiêu chí (Ưu tiên lấy từ PC radio, nếu rỗng thì lấy từ Mobile radio)
+            const scores = [];
+            let isFull = true;
+
+            for(let i = 1; i <= 7; i++) {
+                let checkedRadio = document.querySelector(`input[name="criteria_${i}"]:checked`);
+                if(!checkedRadio) {
+                    checkedRadio = document.querySelector(`input[name="criteria_${i}_mob"]:checked`);
+                }
+                
+                if (checkedRadio) {
+                    scores.push(parseInt(checkedRadio.value));
+                } else {
+                    isFull = false;
+                    break;
+                }
+            }
+
+            if(!isFull) {
+                // Tạo một thông báo lỗi nội bộ tùy chỉnh thay vì alert browser
+                showNotification("Vui lòng trả lời đầy đủ tất cả 7 tiêu chí năng lượng số!", "rose");
+                return;
+            }
+
+            // Tính toán tổng điểm
+            const totalScore = scores.reduce((sum, score) => sum + score, 0);
+
+            // Cấu trúc đối tượng khảo sát
+            const surveyItem = {
+                id: Date.now(),
+                name: studentName,
+                mssv: studentId,
+                scores: scores,
+                total: totalScore,
+                date: new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})
+            };
+
+            // Lưu trữ vào LocalStorage
+            surveyData.push(surveyItem);
+            localStorage.setItem('dcf_survey_results', JSON.stringify(surveyData));
+
+            // Hiển thị thông báo thành công
+            showNotification("Gửi khảo sát thành công!", "emerald");
+
+            // Reset dữ liệu Form
+            document.getElementById('survey-form').reset();
+            
+            // Xóa checked của các bộ radio
+            const allRadios = document.querySelectorAll('input[type="radio"]');
+            allRadios.forEach(r => r.checked = false);
+
+            // Chuyển sang Tab Thống kê tự động sau 1.5 giây để giáo viên / sinh viên xem kết quả xếp hạng
+            setTimeout(() => {
+                switchTab('stats-tab');
+            }, 1500);
+        }
+
+        // Tạo mã QR trực quan
+        let qrcodeInstance = null;
+        function generateQR() {
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = ""; // Clear cũ
+
+            const currentURL = window.location.href;
+            
+            try {
+                // Khởi tạo thư viện QR Code
+                qrcodeInstance = new QRCode(container, {
+                    text: currentURL,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#0c4a6e", // Xanh Navy sẫm (tech-950)
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } catch(err) {
+                // Phương án dự phòng nếu thư viện CDN không nạp được
+                container.innerHTML = `<div class="text-xs text-rose-500 p-4 text-center">Không thể tải bộ mã QR tự động. Vui lòng kết nối mạng Internet.</div>`;
+            }
+        }
+
+        // Sao chép liên kết vào bộ nhớ tạm
+        function copyToClipboard() {
+            const input = document.getElementById('qr-url-input');
+            input.select();
+            input.setSelectionRange(0, 99999); // Cho mobile
+
+            try {
+                document.execCommand('copy');
+                showNotification("Đã sao chép liên kết vào khay nhớ tạm!", "emerald");
+            } catch (err) {
+                showNotification("Lỗi không thể sao chép!", "rose");
+            }
+        }
+
+        // In mã QR
+        function printQR() {
+            const printWindow = window.open('', '_blank');
+            const qrHTML = document.getElementById('qrcode-container').innerHTML;
+            const currentURL = window.location.href;
+            
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>In mã QR Khảo sát Năng lực số</title>
+                    <style>
+                        body { font-family: sans-serif; text-align: center; padding: 50px; }
+                        .qr-card { border: 2px dashed #000; display: inline-block; padding: 40px; border-radius: 20px; }
+                        h1 { font-size: 24px; margin-bottom: 5px; }
+                        p { font-size: 14px; color: #555; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div class="qr-card">
+                        <h1>QUÉT ĐỂ KHẢO SÁT</h1>
+                        <h3>Khung Năng Lực Số Sinh Viên</h3>
+                        <div style="display: flex; justify-content: center; margin: 25px 0;">${qrHTML}</div>
+                        <p>Đường dẫn: <strong>${currentURL}</strong></p>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // Cập nhật giao diện thống kê thực tế
+        function updateStatistics() {
+            const totalStudentsElem = document.getElementById('stat-total-students');
+            const avgScoreElem = document.getElementById('stat-avg-score');
+            const goodCountElem = document.getElementById('stat-good-count');
+            const tbody = document.getElementById('results-tbody');
+            const noDataMsg = document.getElementById('no-data-msg');
+            const tableElem = document.getElementById('stats-table');
+
+            if(surveyData.length === 0) {
+                totalStudentsElem.innerText = "0";
+                avgScoreElem.innerText = "0.0 / 35";
+                goodCountElem.innerText = "0";
+                
+                tbody.innerHTML = "";
+                noDataMsg.classList.remove('hidden');
+                tableElem.classList.add('hidden');
+                return;
+            }
+
+            noDataMsg.classList.add('hidden');
+            tableElem.classList.remove('hidden');
+
+            // 1. Tính toán Thẻ số liệu thống kê
+            const totalStudents = surveyData.length;
+            totalStudentsElem.innerText = totalStudents;
+
+            const totalScoreSum = surveyData.reduce((sum, item) => sum + item.total, 0);
+            const avgScore = (totalScoreSum / totalStudents).toFixed(1);
+            avgScoreElem.innerText = `${avgScore} / 35`;
+
+            const goodCount = surveyData.filter(item => item.total >= 25).length;
+            goodCountElem.innerText = goodCount;
+
+            // 2. SẮP XẾP DANH SÁCH THEO TỔNG ĐIỂM GIẢM DẦN
+            const sortedData = [...surveyData].sort((a, b) => b.total - a.total);
+
+            // 3. Render danh sách sinh viên lên bảng
+            tbody.innerHTML = "";
+            sortedData.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/70 transition duration-150";
+                
+                // Huy chương hoặc xếp hạng top 3
+                let rankBadge = `<span class="font-bold text-slate-500">${index + 1}</span>`;
+                if(index === 0) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-100 text-amber-700 font-bold text-sm">🥇</span>`;
+                if(index === 1) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 text-slate-700 font-bold text-sm">🥈</span>`;
+                if(index === 2) rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-700 font-bold text-sm">🥉</span>`;
+
+                tr.innerHTML = `
+                    <td class="py-4 px-4 text-center">${rankBadge}</td>
+                    <td class="py-4 px-4 font-semibold text-slate-800">${item.name}</td>
+                    <td class="py-4 px-4 text-slate-600 text-sm font-mono">${item.mssv}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[0]}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[1]}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[2]}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[3]}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[4]}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[5]}</td>
+                    <td class="py-4 px-3 text-center text-slate-600 font-medium">${item.scores[6]}</td>
+                    <td class="py-4 px-4 text-center font-bold text-tech-800 bg-tech-50">${item.total} <span class="text-[10px] text-slate-400 font-normal">/35</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Tự chế hộp thông báo phản hồi người dùng (Thay thế alert)
+        function showNotification(message, type = "emerald") {
+            const toast = document.getElementById('success-toast');
+            
+            // Đặt màu tương ứng
+            if(type === "emerald") {
+                toast.className = "fixed bottom-5 right-5 z-50 bg-emerald-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-0 opacity-100";
+            } else if (type === "rose") {
+                toast.className = "fixed bottom-5 right-5 z-50 bg-rose-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-0 opacity-100";
+            } else {
+                toast.className = "fixed bottom-5 right-5 z-50 bg-slate-700 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 transform translate-y-0 opacity-100";
+            }
+            
+            toast.querySelector('p').innerText = message;
+            toast.classList.remove('hidden');
+
+            // Ẩn sau 3 giây
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                toast.classList.add('translate-y-10');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        }
+
+        // Xóa sạch toàn bộ dữ liệu khảo sát (Phục vụ debug, làm lại khảo sát)
+        function clearAllData() {
+            const confirmDelete = confirm("Bạn có chắc chắn muốn xóa TOÀN BỘ danh sách kết quả khảo sát hiện tại? Hành động này không thể hoàn tác.");
+            if(confirmDelete) {
+                surveyData = [];
+                localStorage.removeItem('dcf_survey_results');
+                updateStatistics();
+                showNotification("Đã xóa toàn bộ dữ liệu khảo sát thành công!", "rose");
+            }
+        }
+
+        // Xuất dữ liệu ra file CSV (Excel tiện sử dụng)
+        function exportToCSV() {
+            if(surveyData.length === 0) {
+                showNotification("Không có dữ liệu để xuất!", "rose");
+                return;
+            }
+
+            // Tiêu đề cột (BOM tiếng Việt hỗ trợ Unicode trong Excel)
+            let csvContent = "\uFEFF"; 
+            csvContent += "Hạng,Họ và tên,MSSV,TC1,TC2,TC3,TC4,TC5,TC6,TC7,Tổng điểm,Thời gian nộp\n";
+
+            const sortedData = [...surveyData].sort((a, b) => b.total - a.total);
+            sortedData.forEach((item, index) => {
+                const row = [
+                    index + 1,
+                    `"${item.name.replace(/"/g, '""')}"`,
+                    `"${item.mssv}"`,
+                    item.scores[0],
+                    item.scores[1],
+                    item.scores[2],
+                    item.scores[3],
+                    item.scores[4],
+                    item.scores[5],
+                    item.scores[6],
+                    item.total,
+                    `"${item.date}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            // Tải xuống file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Khao_sat_Nang_luc_so_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification("Đã tải xuống tệp dữ liệu CSV thành công!", "emerald");
+        }
+    </script>
+</body>
+</html>
