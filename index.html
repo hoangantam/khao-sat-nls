@@ -41,18 +41,19 @@
 
     <!-- HEADER -->
     <header class="bg-gradient-to-r from-tech-800 to-tech-950 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm border border-white/10">
-                    <svg class="w-8 h-8 text-tech-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+        <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <!-- LOGO HAUI CẬP NHẬT -->
+                <div class="p-2 bg-white rounded-xl shadow-md border border-white/20 flex-shrink-0">
+                    <img src="logoHaui.png" alt="HaUI Logo" class="h-10 sm:h-12 w-auto object-contain">
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
-                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.2</span>
+                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.3</span>
                     </div>
                     <p class="text-xs sm:text-sm text-tech-200 font-medium">Hệ thống tổng hợp kết quả trực tuyến thời gian thực</p>
-                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span font-semibold text-white>06/09/2026 17:05</span></p>
+                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span class="font-semibold text-white">06/09/2026 17:20</span></p>
                 </div>
             </div>
             
@@ -380,10 +381,12 @@
 
     </main>
 
+    <!-- FOOTER CẬP NHẬT SUB TINTIN -->
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
         <div class="max-w-7xl mx-auto px-4 space-y-1">
             <p>© 2026 Hệ thống khảo sát Khung năng lực số Sinh viên trực tuyến.</p>
-            <p class="text-[11px] text-slate-400">Version 1.2.2 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 17:05</span></p>
+            <p class="text-[11px] text-slate-500 font-semibold tracking-wide">Made by TinTin</p>
+            <p class="text-[10px] text-slate-400">Version 1.2.3 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 17:20</span></p>
         </div>
     </footer>
 
@@ -720,7 +723,6 @@
             }
         };
 
-        // ĐÃ SỬA HÀM DƯỚI ĐÂY ĐỂ NÚT TABS KHÔNG BỊ TRẮNG ĐÈ CHỮ HOẶC DÁN LỖI LAYOUT
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
             const activeSection = document.getElementById(tabId);
