@@ -49,26 +49,26 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
-                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.1</span>
+                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.2</span>
                     </div>
                     <p class="text-xs sm:text-sm text-tech-200 font-medium">Hệ thống tổng hợp kết quả trực tuyến thời gian thực</p>
-                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span font-semibold text-white>06/09/2026 16:53</span></p>
+                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span font-semibold text-white>06/09/2026 17:05</span></p>
                 </div>
             </div>
             
             <!-- NAV TABS -->
-            <nav class="flex bg-tech-900/60 p-1.5 rounded-xl border border-white/5 w-full md:w-auto overflow-x-auto">
-                <button onclick="switchTab('survey-tab')" id="btn-survey-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap bg-white text-tech-950 shadow-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Sinh viên Khảo sát
+            <nav class="flex bg-tech-900/80 p-1.5 rounded-xl border border-white/10 w-full md:w-auto overflow-x-auto gap-1">
+                <button onclick="switchTab('survey-tab')" id="btn-survey-tab" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap bg-white text-tech-900 shadow-md">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Sinh viên Khảo sát</span>
                 </button>
-                <button onclick="switchTab('qr-tab')" id="btn-qr-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                    Mã QR Lớp học
+                <button onclick="switchTab('qr-tab')" id="btn-qr-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white hover:bg-white/10">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                    <span>Mã QR Lớp học</span>
                 </button>
-                <button onclick="switchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    Thống kê trực tuyến (<span id="live-indicator" class="text-emerald-400 font-bold animate-pulse">● Live</span>)
+                <button onclick="switchTab('stats-tab')" id="btn-stats-tab" class="tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white hover:bg-white/10">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span>Thống kê trực tuyến (<span id="live-indicator" class="text-emerald-400 font-bold animate-pulse">● Live</span>)</span>
                 </button>
             </nav>
         </div>
@@ -383,7 +383,7 @@
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
         <div class="max-w-7xl mx-auto px-4 space-y-1">
             <p>© 2026 Hệ thống khảo sát Khung năng lực số Sinh viên trực tuyến.</p>
-            <p class="text-[11px] text-slate-400">Version 1.2.1 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 16:53</span></p>
+            <p class="text-[11px] text-slate-400">Version 1.2.2 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 17:05</span></p>
         </div>
     </footer>
 
@@ -720,18 +720,19 @@
             }
         };
 
+        // ĐÃ SỬA HÀM DƯỚI ĐÂY ĐỂ NÚT TABS KHÔNG BỊ TRẮNG ĐÈ CHỮ HOẶC DÁN LỖI LAYOUT
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
             const activeSection = document.getElementById(tabId);
             if(activeSection) activeSection.classList.remove('hidden');
 
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white";
+                btn.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap text-tech-200 hover:text-white hover:bg-white/10";
             });
 
             const activeButton = document.getElementById('btn-' + tabId);
             if(activeButton) {
-                activeButton.className = "tab-btn px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap bg-white text-tech-950 shadow-sm";
+                activeButton.className = "tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap bg-white text-tech-900 shadow-md";
             }
         };
 
