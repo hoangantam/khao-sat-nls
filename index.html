@@ -47,8 +47,13 @@
                     <svg class="w-8 h-8 text-tech-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                 </div>
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
+                        <!-- Phiên bản code -->
+                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.0</span>
+                    </div>
                     <p class="text-xs sm:text-sm text-tech-200 font-medium">Hệ thống tổng hợp kết quả trực tuyến thời gian thực</p>
+                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span font-semibold text-white>06/09/2026 16:48</span></p>
                 </div>
             </div>
             
@@ -377,18 +382,18 @@
     </main>
 
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
-        <div class="max-w-7xl mx-auto px-4">
+        <div class="max-w-7xl mx-auto px-4 space-y-1">
             <p>© 2026 Hệ thống khảo sát Khung năng lực số Sinh viên trực tuyến.</p>
+            <p class="text-[11px] text-slate-400">Version 1.2.0 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 16:48</span></p>
         </div>
     </footer>
 
-    <!-- FIREBASE MODULE SDK (v10.8.0 - Phiên bản ổn định) -->
+    <!-- FIREBASE MODULE SDK (v10.8.0) -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
         import { getFirestore, doc, setDoc, collection, onSnapshot, deleteDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-        // 1. Cấu hình Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCyayWX0YSUO2XzBm7mTd1-Bi97ef-ES3U",
             authDomain: "khao-sat-nls.firebaseapp.com",
@@ -403,6 +408,7 @@
         const db = getFirestore(app);
 
         let onlineSurveyData = [];
+        let isFirebaseConnected = false;
 
         const criteriaList = [
             { id: 1, title: "1. Sử dụng thiết bị, phần mềm và mạng", desc: "Vận hành phần cứng, cài đặt phần mềm và thiết lập mạng." },
@@ -422,16 +428,15 @@
             if (qrUrlInput) qrUrlInput.value = window.location.href;
             generateQR();
 
-            // Đăng nhập nặc danh tự động vào Firebase
             try {
                 await signInAnonymously(auth);
+                isFirebaseConnected = true;
                 const connStatus = document.getElementById('connection-status');
                 if (connStatus) {
                     connStatus.className = "text-xs bg-emerald-500/20 px-2.5 py-1 rounded-full border border-emerald-400/30 flex items-center gap-1 text-emerald-100";
                     connStatus.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Đã kết nối Cloud`;
                 }
 
-                // Đồng bộ bảng dữ liệu thời gian thực
                 const surveysCol = collection(db, 'surveys');
                 onSnapshot(surveysCol, (snapshot) => {
                     onlineSurveyData = [];
@@ -440,20 +445,26 @@
                     });
                     updateStatistics(onlineSurveyData);
                 }, (error) => {
-                    console.error("Lỗi lắng nghe dữ liệu Firebase: ", error);
+                    console.warn("Lỗi đồng bộ Firestore (chuyển Offline):", error);
+                    loadOfflineFallback();
                 });
 
             } catch (err) {
-                console.warn("Lỗi kết nối Firebase: ", err);
-                const connStatus = document.getElementById('connection-status');
-                if (connStatus) {
-                    connStatus.className = "text-xs bg-amber-500/20 px-2.5 py-1 rounded-full border border-amber-400/30 flex items-center gap-1 text-amber-100";
-                    connStatus.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Chế độ Offline`;
-                }
-                onlineSurveyData = JSON.parse(localStorage.getItem('offline_survey_results')) || [];
-                updateStatistics(onlineSurveyData);
+                console.warn("Lỗi Auth Firebase (chuyển Offline):", err);
+                loadOfflineFallback();
             }
         });
+
+        function loadOfflineFallback() {
+            isFirebaseConnected = false;
+            const connStatus = document.getElementById('connection-status');
+            if (connStatus) {
+                connStatus.className = "text-xs bg-amber-500/20 px-2.5 py-1 rounded-full border border-amber-400/30 flex items-center gap-1 text-amber-100";
+                connStatus.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Chế độ Offline`;
+            }
+            onlineSurveyData = JSON.parse(localStorage.getItem('offline_survey_results')) || [];
+            updateStatistics(onlineSurveyData);
+        }
 
         function renderMobileCards() {
             const container = document.getElementById('mobile-cards-container');
@@ -506,7 +517,7 @@
             }
         }
 
-        // Xử lý Gửi thông tin khảo sát lên Cloud
+        // Xử lý Gửi khảo sát an toàn
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
 
@@ -548,35 +559,37 @@
             const submitBtn = document.getElementById('submit-btn');
             if(submitBtn) submitBtn.disabled = true;
 
-            try {
-                // Đẩy trực tiếp vào thư mục gốc 'surveys' để giản lược quy tắc Firestore
-                const docRef = doc(db, 'surveys', studentId);
-                await setDoc(docRef, surveyItem);
-
-                showNotification("Thành công!", "Đã lưu kết quả khảo sát lên Đám mây!", "emerald");
-
-                document.getElementById('survey-form').reset();
-                document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-
-                setTimeout(() => { switchTab('stats-tab'); }, 1200);
-
-            } catch (err) {
-                console.error("Lỗi Firestore: ", err);
-
-                // Nếu lỗi Cloud, tự động lưu tạm xuống máy
-                let offlineData = JSON.parse(localStorage.getItem('offline_survey_results')) || [];
-                offlineData = offlineData.filter(item => item.mssv !== studentId);
-                offlineData.push(surveyItem);
-                localStorage.setItem('offline_survey_results', JSON.stringify(offlineData));
-
-                updateStatistics(offlineData);
-                showNotification("Lưu tạm cục bộ", "Đã lưu kết quả trên máy này do chưa mở quyền Firebase Firestore!", "amber");
-                
-                setTimeout(() => { switchTab('stats-tab'); }, 1200);
-            } finally {
-                if(submitBtn) submitBtn.disabled = false;
+            // Nếu Firebase kết nối được
+            if (isFirebaseConnected) {
+                try {
+                    const docRef = doc(db, 'surveys', studentId);
+                    await setDoc(docRef, surveyItem);
+                    showNotification("Thành công!", "Đã lưu kết quả khảo sát lên Đám mây!", "emerald");
+                } catch (err) {
+                    console.error("Lỗi Firestore:", err);
+                    saveToLocalStorage(surveyItem, studentId);
+                }
+            } else {
+                saveToLocalStorage(surveyItem, studentId);
             }
+
+            document.getElementById('survey-form').reset();
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            if(submitBtn) submitBtn.disabled = false;
+
+            setTimeout(() => { switchTab('stats-tab'); }, 1200);
         };
+
+        function saveToLocalStorage(surveyItem, studentId) {
+            let offlineData = JSON.parse(localStorage.getItem('offline_survey_results')) || [];
+            offlineData = offlineData.filter(item => item.mssv !== studentId);
+            offlineData.push(surveyItem);
+            localStorage.setItem('offline_survey_results', JSON.stringify(offlineData));
+
+            onlineSurveyData = offlineData;
+            updateStatistics(offlineData);
+            showNotification("Đã lưu kết quả!", "Do Firebase chưa cấu hình Rules, dữ liệu đã lưu an toàn vào máy cá nhân.", "amber");
+        }
 
         function updateStatistics(dataList) {
             const totalStudentsElem = document.getElementById('stat-total-students');
@@ -686,19 +699,27 @@
                 return;
             }
 
-            const confirmDelete = confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ dữ liệu khảo sát trên Cloud?");
+            const confirmDelete = confirm("CẢNH BÁO: Bạn có chắc chắn muốn xóa TOÀN BỘ dữ liệu khảo sát?");
             if(!confirmDelete) return;
 
             localStorage.removeItem('offline_survey_results');
 
-            try {
-                const snapshot = await getDocs(collection(db, 'surveys'));
-                const deletePromises = snapshot.docs.map(docItem => deleteDoc(docItem.ref));
-                await Promise.all(deletePromises);
-                showNotification("Thành công", "Đã xóa toàn bộ dữ liệu khảo sát trực tuyến!", "emerald");
-            } catch (err) {
-                console.error("Lỗi xóa dữ liệu: ", err);
-                showNotification("Lỗi", "Không thể xóa dữ liệu trên Cloud!", "rose");
+            if (isFirebaseConnected) {
+                try {
+                    const snapshot = await getDocs(collection(db, 'surveys'));
+                    const deletePromises = snapshot.docs.map(docItem => deleteDoc(docItem.ref));
+                    await Promise.all(deletePromises);
+                    showNotification("Thành công", "Đã xóa toàn bộ dữ liệu khảo sát trên Cloud!", "emerald");
+                } catch (err) {
+                    console.error("Lỗi xóa dữ liệu: ", err);
+                    onlineSurveyData = [];
+                    updateStatistics([]);
+                    showNotification("Đã dọn dẹp", "Đã dọn sạch bộ nhớ máy cục bộ!", "amber");
+                }
+            } else {
+                onlineSurveyData = [];
+                updateStatistics([]);
+                showNotification("Đã dọn dẹp", "Đã dọn sạch bộ nhớ máy cục bộ!", "amber");
             }
         };
 
