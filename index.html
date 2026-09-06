@@ -49,11 +49,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
-                        <!-- Phiên bản code -->
-                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.0</span>
+                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.2.1</span>
                     </div>
                     <p class="text-xs sm:text-sm text-tech-200 font-medium">Hệ thống tổng hợp kết quả trực tuyến thời gian thực</p>
-                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span font-semibold text-white>06/09/2026 16:48</span></p>
+                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span font-semibold text-white>06/09/2026 16:53</span></p>
                 </div>
             </div>
             
@@ -384,11 +383,11 @@
     <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
         <div class="max-w-7xl mx-auto px-4 space-y-1">
             <p>© 2026 Hệ thống khảo sát Khung năng lực số Sinh viên trực tuyến.</p>
-            <p class="text-[11px] text-slate-400">Version 1.2.0 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 16:48</span></p>
+            <p class="text-[11px] text-slate-400">Version 1.2.1 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">06/09/2026 16:53</span></p>
         </div>
     </footer>
 
-    <!-- FIREBASE MODULE SDK (v10.8.0) -->
+    <!-- FIREBASE MODULE SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
@@ -445,12 +444,12 @@
                     });
                     updateStatistics(onlineSurveyData);
                 }, (error) => {
-                    console.warn("Lỗi đồng bộ Firestore (chuyển Offline):", error);
+                    console.warn("Lỗi Firestore Rules, chuyển sang lưu máy cục bộ:", error);
                     loadOfflineFallback();
                 });
 
             } catch (err) {
-                console.warn("Lỗi Auth Firebase (chuyển Offline):", err);
+                console.warn("Lỗi xác thực Auth, chuyển sang lưu máy cục bộ:", err);
                 loadOfflineFallback();
             }
         });
@@ -517,7 +516,6 @@
             }
         }
 
-        // Xử lý Gửi khảo sát an toàn
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
 
@@ -559,14 +557,13 @@
             const submitBtn = document.getElementById('submit-btn');
             if(submitBtn) submitBtn.disabled = true;
 
-            // Nếu Firebase kết nối được
             if (isFirebaseConnected) {
                 try {
                     const docRef = doc(db, 'surveys', studentId);
                     await setDoc(docRef, surveyItem);
-                    showNotification("Thành công!", "Đã lưu kết quả khảo sát lên Đám mây!", "emerald");
+                    showNotification("Thành công!", "Đã lưu kết quả khảo sát trực tiếp lên Cloud Firebase!", "emerald");
                 } catch (err) {
-                    console.error("Lỗi Firestore:", err);
+                    console.error("Lỗi khi ghi Firestore:", err);
                     saveToLocalStorage(surveyItem, studentId);
                 }
             } else {
@@ -588,7 +585,7 @@
 
             onlineSurveyData = offlineData;
             updateStatistics(offlineData);
-            showNotification("Đã lưu kết quả!", "Do Firebase chưa cấu hình Rules, dữ liệu đã lưu an toàn vào máy cá nhân.", "amber");
+            showNotification("Đã lưu cục bộ!", "Firebase Firestore chưa được mở Rules. Hãy bật Rules trên Firebase Console để lưu Online.", "amber");
         }
 
         function updateStatistics(dataList) {
