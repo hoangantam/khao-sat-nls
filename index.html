@@ -50,10 +50,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-tech-200 bg-clip-text text-transparent">KHẢO SÁT NĂNG LỰC SỐ</h1>
-                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.3.1</span>
+                        <span class="text-[10px] bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full font-mono">v1.3.2 Fix</span>
                     </div>
                     <p class="text-xs sm:text-sm text-tech-200 font-medium">Theo Khung Năng lực số Sinh viên Việt Nam (USSH - Meta 2022)</p>
-                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span class="font-semibold text-white">07/09/2026 11:40</span></p>
+                    <p class="text-[11px] text-tech-300/80 italic mt-0.5">Cập nhật mã nguồn: <span class="font-semibold text-white">07/09/2026 11:45</span></p>
                 </div>
             </div>
             
@@ -407,7 +407,7 @@
         <div class="max-w-7xl mx-auto px-4 space-y-1">
             <p>© 2026 Hệ thống khảo sát Khung năng lực số Sinh viên trực tuyến.</p>
             <p class="text-[11px] text-slate-500 font-semibold tracking-wide">Made by TinTin</p>
-            <p class="text-[10px] text-slate-400">Version 1.3.1 | Cập nhật mã nguồn: <span class="font-medium text-slate-600">07/09/2026 11:40</span></p>
+            <p class="text-[10px] text-slate-400">Version 1.3.2 Fix | Cập nhật mã nguồn: <span class="font-medium text-slate-600">07/09/2026 11:45</span></p>
         </div>
     </footer>
 
@@ -415,7 +415,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getFirestore, doc, setDoc, collection, onSnapshot, deleteDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { getFirestore, addDoc, collection, onSnapshot, deleteDoc, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCyayWX0YSUO2XzBm7mTd1-Bi97ef-ES3U",
@@ -462,18 +462,25 @@
 
                 const surveysCol = collection(db, 'surveys');
                 onSnapshot(surveysCol, (snapshot) => {
-                    onlineSurveyData = [];
-                    snapshot.forEach((doc) => {
-                        onlineSurveyData.push(doc.data());
+                    const tempMap = new Map();
+                    snapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        if (data && data.mssv) {
+                            // Giữ lại bản ghi mới nhất của từng sinh viên nếu trùng MSSV
+                            if (!tempMap.has(data.mssv) || (data.timestamp && data.timestamp > tempMap.get(data.mssv).timestamp)) {
+                                tempMap.set(data.mssv, data);
+                            }
+                        }
                     });
+                    onlineSurveyData = Array.from(tempMap.values());
                     updateStatistics(onlineSurveyData);
                 }, (error) => {
-                    console.warn("Lỗi Firestore Rules, chuyển sang lưu máy cục bộ:", error);
+                    console.warn("Lỗi kết nối Firestore Rules:", error);
                     loadOfflineFallback();
                 });
 
             } catch (err) {
-                console.warn("Lỗi xác thực Auth, chuyển sang lưu máy cục bộ:", err);
+                console.warn("Lỗi xác thực Auth:", err);
                 loadOfflineFallback();
             }
         });
@@ -575,7 +582,8 @@
                 scores: scores,
                 total: totalScore,
                 date: new Date().toLocaleDateString('vi-VN') + ' ' + new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'}),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                created_at: serverTimestamp()
             };
 
             const submitBtn = document.getElementById('submit-btn');
@@ -583,8 +591,8 @@
 
             if (isFirebaseConnected) {
                 try {
-                    const docRef = doc(db, 'surveys', studentId);
-                    await setDoc(docRef, surveyItem);
+                    // Dùng addDoc để tạo Document ID duy nhất, tránh bị ghi đè
+                    await addDoc(collection(db, 'surveys'), surveyItem);
                     showNotification("Thành công!", "Đã lưu kết quả khảo sát trực tiếp lên Cloud Firebase!", "emerald");
                 } catch (err) {
                     console.error("Lỗi khi ghi Firestore:", err);
@@ -609,7 +617,7 @@
 
             onlineSurveyData = offlineData;
             updateStatistics(offlineData);
-            showNotification("Đã lưu cục bộ!", "Firebase Firestore chưa được mở Rules. Hãy bật Rules trên Firebase Console để lưu Online.", "amber");
+            showNotification("Đã lưu cục bộ!", "Chế độ offline: Dữ liệu đã lưu tạm thời vào trình duyệt.", "amber");
         }
 
         function updateStatistics(dataList) {
@@ -714,7 +722,6 @@
             showNotification("Thành công", "Đã xuất file báo cáo CSV thành công!", "emerald");
         };
 
-        // YÊU CẦU NHẬP MẬT KHẨU 1102 KHI XÓA DỮ LIỆU CLOUD
         window.clearAllData = async function() {
             if (onlineSurveyData.length === 0) {
                 showNotification("Cảnh báo", "Kho dữ liệu hiện tại vốn đang trống!", "amber");
@@ -723,7 +730,7 @@
 
             const password = prompt("XÁC NHẬN BẢO MẬT:\nVui lòng nhập mật khẩu quản trị để xóa dữ liệu Cloud:");
             
-            if (password === null) return; // Người dùng nhấn Hủy
+            if (password === null) return;
 
             if (password.trim() !== "1102") {
                 showNotification("Lỗi bảo mật", "Mật khẩu không chính xác! Thao tác bị hủy.", "rose");
